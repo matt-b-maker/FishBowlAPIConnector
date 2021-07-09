@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>FishbowlConnector.Net.Json</id>
+    <version>1.0.0</version>
+    <authors>Adam Humpherys, Manwaring Web Solutions</authors>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <license type="expression">MIT</license>
+    <licenseUrl>https://licenses.nuget.org/MIT</licenseUrl>
+    <projectUrl>https://manwaring-web-solutions.github.io/Fishbowl-Connector-Net/</projectUrl>
+    <description>Package for interacting with the Fishbowl Connector API from a .NET project using JSON.</description>
+    <releaseNotes>Initial release</releaseNotes>
+    <copyright>© 2019 Manwaring Web Solutions</copyright>
+    <repository url="https://github.com/manwaring-web-solutions/Fishbowl-Connector-Net" />
+    <dependencies>
+      <group targetFramework=".NETFramework4.6">
+        <dependency id="LumenWorks.Framework.IO" version="3.8.0" exclude="Build,Analyzers" />
+        <dependency id="Newtonsoft.Json" version="12.0.2" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+    <frameworkAssemblies>
+      <frameworkAssembly assemblyName="Microsoft.CSharp" targetFramework=".NETFramework4.6" />
+    </frameworkAssemblies>
+  </metadata>
+  <files>
+    <file src="C:\Users\WorkBoi\source\repos\FishBowlConnector\src\FishbowlConnector\bin\Debug\net46\FishbowlConnector.exe" target="lib\net46\FishbowlConnector.exe" />
+  </files>
+</package>
