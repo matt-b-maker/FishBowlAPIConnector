@@ -45,10 +45,10 @@ namespace FishbowlConnector
         /// <summary>
         /// Use for connecting and logging in
         /// </summary>
-        public void Connect()
+        public int Connect()
         {
             _connection = new ConnectionObject(_host, _port);
-            Login();
+            return Login();
         }
 
         private dynamic BeginRequest(dynamic _cmd)
@@ -65,7 +65,7 @@ namespace FishbowlConnector
             return cmd;
         }
 
-        private void Login()
+        private int Login()
         {
             dynamic cmd = new { LoginRq = new { IAID = 3399 /* Application ID, can be any number */, IAName = "Ok Jobby Bobby", IADescription = "This is a test", UserName = _user, UserPassword = _pass } };
             cmd = BeginRequest(cmd);
@@ -81,6 +81,8 @@ namespace FishbowlConnector
                 throw new Exception("Login failed with status code " + resp.FbiJson.FbiMsgsRs.statusCode + (resp.FbiJson.FbiMsgsRs.statusMessage != null ? ": " + resp.FbiJson.FbiMsgsRs.statusMessage : ""));
             if (resp.FbiJson.FbiMsgsRs.LoginRs.statusCode != 1000)
                 throw new Exception("Login Error " + resp.FbiJson.FbiMsgsRs.LoginRs.statusCode + ": " + resp.FbiJson.FbiMsgsRs.LoginRs.statusMessage.Value);
+
+            return resp.FbiJson.FbiMsgsRs.statusCode;
         }
 
         /// <summary>
@@ -101,12 +103,17 @@ namespace FishbowlConnector
             //File.WriteAllText(@"C:\tmp\cmd_resp.json", r);
             dynamic resp = JsonConvert.DeserializeObject(r);
 
-            if (resp.FbiJson.FbiMsgsRs.statusCode != 1000 && resp.FbiJson.FbiMsgsRs.statusCode != 900)
-                throw new Exception("Execute Query failed with status code " + resp.FbiJson.FbiMsgsRs.statusCode + (resp.FbiJson.FbiMsgsRs.statusMessage != null ? ": " + resp.FbiJson.FbiMsgsRs.statusMessage : ""));
-            if (resp.FbiJson.FbiMsgsRs.ExecuteQueryRs.statusCode != 1000)
-                throw new Exception("Execute Query Error " + resp.FbiJson.FbiMsgsRs.ExecuteQueryRs.statusCode + ": " + resp.FbiJson.FbiMsgsRs.ExecuteQueryRs.statusMessage.Value);
+            //if (resp.FbiJson.FbiMsgsRs.statusCode != 1000 && resp.FbiJson.FbiMsgsRs.statusCode != 900)
+            //    throw new Exception("Execute Query failed with status code " + resp.FbiJson.FbiMsgsRs.statusCode + (resp.FbiJson.FbiMsgsRs.statusMessage != null ? ": " + resp.FbiJson.FbiMsgsRs.statusMessage : ""));
+            //if (resp.FbiJson.FbiMsgsRs.ExecuteQueryRs.statusCode != 1000)
+            //    throw new Exception("Execute Query Error " + resp.FbiJson.FbiMsgsRs.ExecuteQueryRs.statusCode + ": " + resp.FbiJson.FbiMsgsRs.ExecuteQueryRs.statusMessage.Value);
 
-            return ConvertFromJson(resp);
+            if (resp.FbiJson.FbiMsgsRs.statusCode != 1000 && resp.FbiJson.FbiMsgsRs.statusCode != 900)
+                resp = "Execute Query failed with status code " + resp.FbiJson.FbiMsgsRs.statusCode + (resp.FbiJson.FbiMsgsRs.statusMessage != null ? ": " + resp.FbiJson.FbiMsgsRs.statusMessage : "");
+            if (resp.FbiJson.FbiMsgsRs.ExecuteQueryRs.statusCode != 1000)
+                resp = "Execute Query Error " + resp.FbiJson.FbiMsgsRs.ExecuteQueryRs.statusCode + ": " + resp.FbiJson.FbiMsgsRs.ExecuteQueryRs.statusMessage.Value;
+
+            return ConvertQueryFromJson(resp);
         }
 
         /// <summary>
@@ -114,7 +121,7 @@ namespace FishbowlConnector
         /// </summary>
         /// <param name="type"></param>
         /// <param name="data"></param>
-        public void Import(string type, dynamic data)
+        public string Import(string type, dynamic data)
         {
             dynamic cmd = new { ImportRq = new { Type = type, Rows = new { Row = data } } };
             cmd = BeginRequest(cmd);
@@ -122,18 +129,20 @@ namespace FishbowlConnector
             string r = _connection.sendCommand(JsonConvert.SerializeObject(cmd));
             //File.WriteAllText(@"C:\tmp\cmd_resp.json", r);
             if (r == "")
-                throw new Exception("Empty response returned for Import request");
+                return "Something went wrong";
             dynamic resp = JsonConvert.DeserializeObject(r);
 
-            if (resp.FbiJson.FbiMsgsRs.statusCode != 1000 && resp.FbiJson.FbiMsgsRs.statusCode != 900)
-                throw new Exception("Import failed with status code " + resp.FbiJson.FbiMsgsRs.statusCode + (resp.FbiJson.FbiMsgsRs.statusMessage != null ? ": " + resp.FbiJson.FbiMsgsRs.statusMessage : ""));
-            if (resp.FbiJson.FbiMsgsRs.ImportRs.statusCode != 1000)
-                throw new Exception("Import Error " + resp.FbiJson.FbiMsgsRs.ImportRs.statusCode + ": " + resp.FbiJson.FbiMsgsRs.ImportRs.statusMessage.Value);
+            //if (resp.FbiJson.FbiMsgsRs.statusCode != 1000 && resp.FbiJson.FbiMsgsRs.statusCode != 900)
+            //    resp = "Import failed with status code " + resp.FbiJson.FbiMsgsRs.statusCode + (resp.FbiJson.FbiMsgsRs.statusMessage != null ? ": " + resp.FbiJson.FbiMsgsRs.statusMessage : "");
+            //if (resp.FbiJson.FbiMsgsRs.ImportRs.statusCode != 1000)
+            //    resp = "Import Error " + resp.FbiJson.FbiMsgsRs.ImportRs.statusCode + ": " + resp.FbiJson.FbiMsgsRs.ImportRs.statusMessage.Value;
+
+            return resp.FbiJson.FbiMsgsRs.ImportRs.statusCode + " " + resp.FbiJson.FbiMsgsRs.ImportRs.statusMessage;
         }
 
-        private string ConvertFromJson(dynamic data)
+        private string ConvertQueryFromJson(dynamic data)
         {
-            DataTable t = new DataTable();
+            //DataTable t = new DataTable();
 
             _key = data.FbiJson.Ticket.Key;
             var rowData = data.FbiJson.FbiMsgsRs.ExecuteQueryRs.Rows.Row;

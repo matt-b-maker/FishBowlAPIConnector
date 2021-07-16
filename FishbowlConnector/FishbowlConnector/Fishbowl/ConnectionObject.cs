@@ -46,7 +46,7 @@ namespace FishbowlConnector
                 bw.Write(bytes.Length);
                 bw.Write(bytes);
                 bw.Flush();
-                Thread.Sleep(2000); // required for server to process before sending response
+                Thread.Sleep(10000); // required for server to process before sending response
                 br = new EndianBinaryReader(new BigEndianBitConverter(), tcS);
                 int i = br.ReadInt32();
                 byte[] bytess = new byte[i];
